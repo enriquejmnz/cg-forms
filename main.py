@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
 """
-cg-forms — Automatización de documentos PDF y Word desde CSV o Excel.
+cg-forms — Automatización de documentos PDF y Word desde Excel.
 
 Uso:
     python main.py                    # Procesar filas pendientes
-    python main.py --dry-run          # Simular sin generar archivos ni marcar la fuente
+    python main.py --dry-run          # Simular sin generar archivos ni marcar el Excel
     python main.py --only-index 5     # Procesar solo la fila con índice 5
     python main.py --list-pdf-fields  # Listar campos AcroForm de cada PDF
     python main.py --validate-word-vars  # Validar variables en plantillas Word
 """
 
 import argparse
-import csv
 import logging
 import re
 import sys
@@ -85,8 +84,14 @@ def normalize_row(row: pd.Series) -> dict:
         key = to_snake_case(str(col))
         if pd.isna(val) or val is None or (isinstance(val, float) and np.isnan(val)):
             result[key] = ""
+        elif isinstance(val, pd.Timestamp):
+            result[key] = val.strftime("%d/%m/%Y")
         else:
-            result[key] = str(val).strip()
+            text = str(val).strip()
+            if re.fullmatch(r"\d{4}-\d{2}-\d{2} 00:00:00", text):
+                result[key] = pd.to_datetime(text).strftime("%d/%m/%Y")
+            else:
+                result[key] = text
     return result
 
 
@@ -129,23 +134,18 @@ def apply_mapping(ctx: dict, mapping: dict) -> dict:
 
 
 def read_excel() -> pd.DataFrame:
-    """Lee el archivo fuente (Excel o CSV) y devuelve el DataFrame completo."""
+    """Lee el archivo Excel y devuelve el DataFrame completo."""
     source_path = Path(config.EXCEL_SETTINGS["file"])
     if not source_path.exists():
-        log.error(f"Archivo fuente no encontrado: {source_path.resolve()}")
+        log.error(f"Archivo Excel no encontrado: {source_path.resolve()}")
         sys.exit(1)
 
-    suffix = source_path.suffix.lower()
-    if suffix == ".csv":
-        df = pd.read_csv(source_path, dtype=str, keep_default_na=False, encoding="utf-8-sig")
-        log.info(f"CSV cargado: {len(df)} filas, {len(df.columns)} columnas")
-    else:
-        df = pd.read_excel(
-            source_path,
-            sheet_name=config.EXCEL_SETTINGS["sheet_name"],
-            dtype=str,
-        )
-        log.info(f"Excel cargado: {len(df)} filas, {len(df.columns)} columnas")
+    df = pd.read_excel(
+        source_path,
+        sheet_name=config.EXCEL_SETTINGS["sheet_name"],
+        dtype=str,
+    )
+    log.info(f"Excel cargado: {len(df)} filas, {len(df.columns)} columnas")
 
     # conservar el número de fila original del archivo para poder reescribirlo luego
     df["__source_row_number__"] = range(1, len(df) + 1)
@@ -170,7 +170,7 @@ def get_pending_indices(df: pd.DataFrame) -> list[int]:
 
     if real_status_col is None:
         log.warning(
-            f"Columna '{status_col}' no encontrada en la fuente de datos. "
+            f"Columna '{status_col}' no encontrada en el Excel. "
             f"Se procesarán TODAS las filas."
         )
         return list(df.index)
@@ -190,43 +190,10 @@ def get_pending_indices(df: pd.DataFrame) -> list[int]:
 
 
 def mark_as_processed(row_index: int, source_row_number: int | None = None) -> None:
-    """Marca una fila como procesada en el archivo fuente original."""
+    """Marca una fila como procesada en el archivo Excel original."""
     source_path = Path(config.EXCEL_SETTINGS["file"])
     status_col = config.EXCEL_SETTINGS["status_column"]
     processed_val = config.EXCEL_SETTINGS["processed_value"]
-
-    if source_path.suffix.lower() == ".csv":
-        with open(source_path, newline="", encoding="utf-8-sig") as fh:
-            rows = list(csv.reader(fh))
-
-        if not rows:
-            log.error("El CSV está vacío; no se pudo marcar como procesado.")
-            return
-
-        headers = rows[0]
-        normalized_headers = {str(h).strip().lower(): i for i, h in enumerate(headers)}
-        col_idx = normalized_headers.get(status_col.strip().lower())
-
-        if col_idx is None:
-            log.error(f"No se encontró la columna '{status_col}' en el CSV para marcar.")
-            return
-
-        csv_row = source_row_number if source_row_number is not None else row_index + 1
-        if csv_row >= len(rows):
-            log.error(f"Índice de fila {row_index} fuera de rango al actualizar el CSV.")
-            return
-
-        target_row = rows[csv_row]
-        if len(target_row) <= col_idx:
-            target_row.extend([""] * (col_idx + 1 - len(target_row)))
-        target_row[col_idx] = processed_val
-
-        with open(source_path, "w", newline="", encoding="utf-8-sig") as fh:
-            writer = csv.writer(fh)
-            writer.writerows(rows)
-
-        log.debug(f"Fila {row_index} marcada como '{processed_val}' en CSV.")
-        return
 
     wb = openpyxl.load_workbook(source_path)
     ws = wb[config.EXCEL_SETTINGS["sheet_name"]]
@@ -283,9 +250,8 @@ def fill_pdf(template_path: str | Path, output_path: str | Path, data: dict) -> 
     reader = PdfReader(str(template_path))
     writer = PdfWriter()
 
-    # Copiar todas las páginas
-    for page in reader.pages:
-        writer.add_page(page)
+    # Clonar el documento completo para preservar /AcroForm
+    writer.clone_reader_document_root(reader)
 
     # Obtener campos existentes para validación
     existing_fields = set()
@@ -299,6 +265,9 @@ def fill_pdf(template_path: str | Path, output_path: str | Path, data: dict) -> 
                 f"Campo '{field_name}' del mapping no existe en {template_path.name}. "
                 f"Será ignorado."
             )
+
+    if not writer.pages:
+        raise ValueError(f"El PDF no contiene páginas: {template_path}")
 
     # Llenar campos (pypdf ignora silenciosamente campos que no existen)
     writer.update_page_form_field_values(writer.pages[0], data)
@@ -624,7 +593,7 @@ def run(
     log.info(f"\n{'=' * 60}")
     log.info("RESUMEN FINAL")
     log.info(f"{'=' * 60}")
-    log.info(f"Total filas en fuente:     {len(df)}")
+    log.info(f"Total filas en Excel:      {len(df)}")
     log.info(f"Filas pendientes al inicio: {len(pending)}")
     log.info(f"Exitosas:                  {exitosos}")
     log.info(f"Fallidas:                  {fallidos}")
@@ -644,7 +613,7 @@ def run(
 def parse_args() -> argparse.Namespace:
     """Define y parsea argumentos de línea de comandos."""
     parser = argparse.ArgumentParser(
-        description="cg-forms — Automatización de documentos PDF y Word desde CSV o Excel",
+        description="cg-forms — Automatización de documentos PDF y Word desde Excel",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Ejemplos:
@@ -659,7 +628,7 @@ Ejemplos:
     parser.add_argument(
         "--dry-run",
         action="store_true",
-        help="Simular el procesamiento sin generar archivos ni modificar la fuente de datos",
+        help="Simular el procesamiento sin generar archivos ni modificar el Excel",
     )
     parser.add_argument(
         "--only-index",

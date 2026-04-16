@@ -2,24 +2,24 @@
 Configuración central del proyecto cg-forms.
 
 INSTRUCCIONES:
-  1. Ajusta EXCEL_SETTINGS con la ruta, hoja y columna de estado de tu fuente de datos.
+  1. Ajusta EXCEL_SETTINGS con la ruta, hoja y columna de estado de tu Excel.
   2. En cada entrada de PDF_TEMPLATES, pega tu mapeo real:
        clave = nombre exacto del campo AcroForm en el PDF
-       valor = nombre de la columna del CSV/Excel (en snake_case) o clave de DERIVED_FIELDS
+       valor = nombre de la columna del Excel (en snake_case) o clave de DERIVED_FIELDS
   3. En cada entrada de WORD_TEMPLATES, pega tu mapeo real:
        clave = nombre de la variable {{ variable }} en el .docx (sin llaves)
-       valor = nombre de la columna del CSV/Excel (en snake_case) o clave de DERIVED_FIELDS
+       valor = nombre de la columna del Excel (en snake_case) o clave de DERIVED_FIELDS
   4. En DERIVED_FIELDS define campos calculados como funciones lambda
      que reciben el contexto base (dict) y devuelven un string.
   5. Ajusta OUTPUT_FOLDER_PATTERN para definir cómo se nombran las carpetas de salida.
 """
 
 # ──────────────────────────────────────────────
-# FUENTE DE DATOS
+# EXCEL
 # ──────────────────────────────────────────────
 
 EXCEL_SETTINGS = {
-    "file": "data/datoscsv.csv",
+    "file": "data/datos.xlsx",
     "sheet_name": "Hoja1",
     "status_column": "procesado",
     "pending_values": ["", "no", "NO", "No", None],
@@ -32,7 +32,7 @@ EXCEL_SETTINGS = {
 # Cada entrada define:
 #   template    -> ruta relativa al PDF rellenable original
 #   output_name -> nombre del archivo generado
-#   mapping     -> { campo_pdf: columna_csv_excel_o_derivado }
+#   mapping     -> { campo_pdf: columna_excel_o_derivado }
 
 PDF_TEMPLATES = [
     {
@@ -151,27 +151,46 @@ PDF_TEMPLATES = [
 # Cada entrada define:
 #   template    -> ruta relativa al .docx con variables {{ var }}
 #   output_name -> nombre del archivo generado
-#   mapping     -> { variable_docx: columna_csv_excel_o_derivado }
+#   mapping     -> { variable_docx: columna_excel_o_derivado }
 #
 # Si mapping está vacío, se pasa el contexto completo a docxtpl
-# (todas las columnas del CSV/Excel + campos derivados).
+# (todas las columnas del Excel + campos derivados).
 
 WORD_TEMPLATES = [
     {
         "template": "templates/word/plantilla1.docx",
         "output_name": "plantilla1.docx",
         "mapping": {
-            # PEGAR_AQUI_MAPEO_WORD_1
-            # Ejemplo:
-            # "nombre": "nombre_completo",
-            # "expediente": "numero_expediente",
+            "fecha": "fecha_oficio_entrega",
+            "oficio": "num_oficio_entrega",
+            "nombre_licenciada_entrega": "nombre_licenciada_entrega",
+            "apellido_licenciada_entrega": "apellido_licenciada_entrega",
+            "cantidad_sobres": "cantidad_sobres",
+            "detalle_copias": "detalle_copias",
+            "carpetilla": "carpetilla",
+            "delito_generico": "delito_generico",
+            "fecha_oficio_entrega": "fecha_oficio_entrega",
+            "investigado_nombre": "investigado_nombre",
+            "num_oficio_entrega": "num_oficio_entrega",
+            "oficio_judicial": "oficio_judicial",
+            "usuario_iniciales": "usuario_iniciales"
+
+
         },
     },
     {
         "template": "templates/word/plantilla2.docx",
         "output_name": "plantilla2.docx",
         "mapping": {
-            # PEGAR_AQUI_MAPEO_WORD_2
+            "fecha": "fecha_documento_word",
+            "oficio_judicial": "oficio_judicial",
+            "carpetilla": "carpetilla",
+            "indiciado": "investigado_nombre",
+            "delito": "delito_resumen",
+            "victima": "usuario_iniciales",
+            "usuario_iniciales": "usuario_iniciales",
+            "usuario_edad": "usuario_edad"
+
         },
     },
 ]
@@ -187,7 +206,17 @@ WORD_TEMPLATES = [
 #   "fecha_formateada": lambda ctx: ctx.get("fecha", "")[:10] if ctx.get("fecha") else "",
 
 DERIVED_FIELDS = {
-    # PEGAR_AQUI_CAMPOS_DERIVADOS
+    "fecha_documento_word": lambda ctx: str(
+        ctx.get("fecha_oficio_entrega", "") or ctx.get("oficio_fecha", "")
+    ).strip(),
+    "delito_resumen": lambda ctx: " - ".join(
+        part
+        for part in [
+            str(ctx.get("delito_generico", "")).strip(),
+            str(ctx.get("delito_especifico", "")).strip(),
+        ]
+        if part
+    ),
 }
 
 # ──────────────────────────────────────────────
