@@ -4,3 +4,4 @@ __pycache__/
 output/
 .DS_Store
 data/datoscsv.csv
+data/datos.xlsx
