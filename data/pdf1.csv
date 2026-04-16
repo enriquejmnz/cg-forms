@@ -1,0 +1,31 @@
+﻿Excel,pdf
+registro,N de registro
+provincia,Provincia
+distrito,Distrito
+corregimiento,Corregimiento
+oficio_fecha,Fecha oficio
+oficio_hora,Hora oficio
+despacho_solicitante,Despacho Solicitante
+autoridad_solcitante,Autoridad Solicitante
+oficio_exp,N de Oficio
+carpetilla,N de noticia criminal
+delito_generico,Delito Generico
+delito_especifico,Delito Especifico
+lugar_hecho,Lugar del hecho
+fase_proceso,Fase del proceso
+fecha_diligencia,Fecha
+hora_diligencia,Hora
+servicio_solicitado,Servicio solicitado
+profesional,Profesional de psicologia
+operador,operador
+usuario_iniciales,Nombre del usuario
+usuario_genero,Sexo
+usuario_cedula,N de cedula
+usuario_fecha_nacimiento,Fecha de nacimiento
+usuario_edad,Edad
+usuario_nacionalidad,Nacionalidad
+investigado_nombre,Nombre investigado
+investigado_edad_sexo,Edad y sexo
+investigado_parentesco,Parentesco
+coodinadora,Coordinadora
+tecnico_operador,Tecnico operadora
