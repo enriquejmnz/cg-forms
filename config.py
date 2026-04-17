@@ -228,26 +228,32 @@ DERIVED_FIELDS = {
 
 def output_folder_name(ctx: dict, row_index: int) -> str:
     """Genera el nombre de la carpeta de salida para un registro."""
-    expediente = str(ctx.get("oficio_exp", "") or ctx.get("registro", "")).strip()
-    nombre = str(ctx.get("usuario_iniciales", "") or ctx.get("investigado_nombre", "")).strip()
+    import re
+    from datetime import datetime
 
-    if expediente and nombre:
-        # Limpiar caracteres no válidos para nombres de carpeta
-        safe_name = "".join(
-            c if c.isalnum() or c in (" ", "-", "_") else "_" for c in nombre
-        )
-        safe_exp = "".join(
-            c if c.isalnum() or c in ("-", "_") else "_" for c in expediente
-        )
-        return f"{safe_exp}_{safe_name}".strip("_")
+    def format_date(date_str: str) -> str:
+        date_str = str(date_str).strip()
+        if not date_str:
+            return ""
+        for fmt in ("%d/%m/%Y", "%d-%m-%Y", "%Y-%m-%d"):
+            try:
+                return datetime.strptime(date_str, fmt).strftime("%d-%m-%Y")
+            except ValueError:
+                continue
+        return date_str
 
-    if expediente:
-        return expediente
-    if nombre:
-        safe_name = "".join(
-            c if c.isalnum() or c in (" ", "-", "_") else "_" for c in nombre
-        )
-        return safe_name.strip("_")
+    carpetilla = str(ctx.get("carpetilla", "")).strip()
+    usuario = str(ctx.get("usuario_iniciales", "")).strip()
+    fecha = format_date(ctx.get("fecha_diligencia", ""))
+
+    if carpetilla and usuario and fecha:
+        return f"{carpetilla}_{usuario}_{fecha}"
+    if carpetilla and usuario:
+        return f"{carpetilla}_{usuario}"
+    if carpetilla:
+        return carpetilla
+    if usuario:
+        return usuario
 
     return f"registro_{row_index}"
 
