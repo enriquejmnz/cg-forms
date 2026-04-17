@@ -350,3 +350,58 @@ PermissionError: [Errno 13] Permission denied: 'data\\datos.xlsx'
 2026-04-17 11:43:56 | INFO    | Modo:                      PRODUCCIÓN
 2026-04-17 11:43:56 | INFO    | Log guardado en:           output/cg-forms.log
 2026-04-17 11:43:56 | INFO    | ============================================================
+2026-04-17 13:45:44 | INFO    | ============================================================
+2026-04-17 13:45:44 | INFO    | cg-forms — Inicio de procesamiento
+2026-04-17 13:45:44 | INFO    | Modo: PRODUCCIÓN
+2026-04-17 13:45:44 | INFO    | ============================================================
+2026-04-17 13:45:44 | INFO    | Excel cargado: 2 filas, 38 columnas
+2026-04-17 13:45:44 | INFO    | Filas pendientes: 1 de 2 totales
+2026-04-17 13:45:44 | INFO    | 
+────────────────────────────────────────
+2026-04-17 13:45:44 | INFO    | Procesando fila 1 | 202500086032 A.L.G. 17.04.2026
+2026-04-17 13:45:44 | INFO    | ────────────────────────────────────────
+2026-04-17 13:45:44 | WARNING | Campo 'Fecha oficio' del mapping no existe en formulario1.pdf. Será ignorado.
+2026-04-17 13:45:44 | WARNING | Campo 'Hora oficio' del mapping no existe en formulario1.pdf. Será ignorado.
+2026-04-17 13:45:44 | WARNING | Campo 'Lugar del hecho' del mapping no existe en formulario1.pdf. Será ignorado.
+2026-04-17 13:45:44 | WARNING | Campo 'Fase del proceso' del mapping no existe en formulario1.pdf. Será ignorado.
+2026-04-17 13:45:44 | WARNING | Campo 'Servicio solicitado' del mapping no existe en formulario1.pdf. Será ignorado.
+2026-04-17 13:45:44 | WARNING | Campo 'Profesional de psicologia' del mapping no existe en formulario1.pdf. Será ignorado.
+2026-04-17 13:45:44 | WARNING | Campo 'operador' del mapping no existe en formulario1.pdf. Será ignorado.
+2026-04-17 13:45:44 | WARNING | Campo 'Nombre del usuario' del mapping no existe en formulario1.pdf. Será ignorado.
+2026-04-17 13:45:44 | WARNING | Campo 'Sexo' del mapping no existe en formulario1.pdf. Será ignorado.
+2026-04-17 13:45:44 | WARNING | Campo 'N de cedula' del mapping no existe en formulario1.pdf. Será ignorado.
+2026-04-17 13:45:44 | WARNING | Campo 'Fecha de nacimiento' del mapping no existe en formulario1.pdf. Será ignorado.
+2026-04-17 13:45:44 | WARNING | Campo 'Edad' del mapping no existe en formulario1.pdf. Será ignorado.
+2026-04-17 13:45:44 | WARNING | Campo 'Nacionalidad' del mapping no existe en formulario1.pdf. Será ignorado.
+2026-04-17 13:45:44 | WARNING | Campo 'Nombre investigado' del mapping no existe en formulario1.pdf. Será ignorado.
+2026-04-17 13:45:44 | WARNING | Campo 'Edad y sexo' del mapping no existe en formulario1.pdf. Será ignorado.
+2026-04-17 13:45:44 | WARNING | Campo 'Parentesco' del mapping no existe en formulario1.pdf. Será ignorado.
+2026-04-17 13:45:44 | DEBUG   | PDF generado: output\202500086032 A.L.G. 17.04.2026\formulario1.pdf
+2026-04-17 13:45:44 | INFO    |   ✓ PDF: formulario1.pdf
+2026-04-17 13:45:44 | WARNING | Campo 'Hora' del mapping no existe en formulario2.pdf. Será ignorado.
+2026-04-17 13:45:44 | WARNING | Campo 'operador' del mapping no existe en formulario2.pdf. Será ignorado.
+2026-04-17 13:45:44 | DEBUG   | PDF generado: output\202500086032 A.L.G. 17.04.2026\formulario2.pdf
+2026-04-17 13:45:44 | INFO    |   ✓ PDF: formulario2.pdf
+2026-04-17 13:45:45 | WARNING | Campo 'Hora' del mapping no existe en formulario3.pdf. Será ignorado.
+2026-04-17 13:45:45 | WARNING | Campo 'Coordinadora' del mapping no existe en formulario3.pdf. Será ignorado.
+2026-04-17 13:45:45 | WARNING | Campo 'Tecnico operadora' del mapping no existe en formulario3.pdf. Será ignorado.
+2026-04-17 13:45:45 | DEBUG   | PDF generado: output\202500086032 A.L.G. 17.04.2026\formulario3.pdf
+2026-04-17 13:45:45 | INFO    |   ✓ PDF: formulario3.pdf
+2026-04-17 13:45:45 | DEBUG   | Word generado: output\202500086032 A.L.G. 17.04.2026\plantilla1.docx
+2026-04-17 13:45:45 | INFO    |   ✓ Word: plantilla1.docx
+2026-04-17 13:45:45 | DEBUG   | Word generado: output\202500086032 A.L.G. 17.04.2026\plantilla2.docx
+2026-04-17 13:45:45 | INFO    |   ✓ Word: plantilla2.docx
+2026-04-17 13:45:45 | DEBUG   | Fila 1 marcada como 'SI' en Excel.
+2026-04-17 13:45:45 | INFO    |   ✓ Fila 1 marcada como procesada
+2026-04-17 13:45:45 | INFO    | 
+============================================================
+2026-04-17 13:45:45 | INFO    | RESUMEN FINAL
+2026-04-17 13:45:45 | INFO    | ============================================================
+2026-04-17 13:45:45 | INFO    | Total filas en Excel:      2
+2026-04-17 13:45:45 | INFO    | Filas pendientes al inicio: 1
+2026-04-17 13:45:45 | INFO    | Exitosas:                  1
+2026-04-17 13:45:45 | INFO    | Fallidas:                  0
+2026-04-17 13:45:45 | INFO    | Pendientes restantes:      0
+2026-04-17 13:45:45 | INFO    | Modo:                      PRODUCCIÓN
+2026-04-17 13:45:45 | INFO    | Log guardado en:           output/cg-forms.log
+2026-04-17 13:45:45 | INFO    | ============================================================

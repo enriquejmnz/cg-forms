@@ -173,9 +173,7 @@ WORD_TEMPLATES = [
             "investigado_nombre": "investigado_nombre",
             "num_oficio_entrega": "num_oficio_entrega",
             "oficio_judicial": "oficio_judicial",
-            "usuario_iniciales": "usuario_iniciales"
-
-
+            "usuario_iniciales": "usuario_iniciales",
         },
     },
     {
@@ -189,8 +187,7 @@ WORD_TEMPLATES = [
             "delito": "delito_resumen",
             "victima": "usuario_iniciales",
             "usuario_iniciales": "usuario_iniciales",
-            "usuario_edad": "usuario_edad"
-
+            "usuario_edad": "usuario_edad",
         },
     },
 ]
@@ -237,7 +234,7 @@ def output_folder_name(ctx: dict, row_index: int) -> str:
             return ""
         for fmt in ("%d/%m/%Y", "%d-%m-%Y", "%Y-%m-%d"):
             try:
-                return datetime.strptime(date_str, fmt).strftime("%d-%m-%Y")
+                return datetime.strptime(date_str, fmt).strftime("%d.%m.%Y")
             except ValueError:
                 continue
         return date_str
@@ -247,9 +244,9 @@ def output_folder_name(ctx: dict, row_index: int) -> str:
     fecha = format_date(ctx.get("fecha_diligencia", ""))
 
     if carpetilla and usuario and fecha:
-        return f"{carpetilla}_{usuario}_{fecha}"
+        return f"{carpetilla} {usuario} {fecha}"
     if carpetilla and usuario:
-        return f"{carpetilla}_{usuario}"
+        return f"{carpetilla} {usuario}"
     if carpetilla:
         return carpetilla
     if usuario:
